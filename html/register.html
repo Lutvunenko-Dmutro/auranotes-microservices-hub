@@ -1,19 +1,49 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uk">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Регистрация</title>
+    <title>Реєстрація — Aura Notes</title>
     <link rel="stylesheet" href="../css/Styles.css">
 </head>
 <body>
-    <h1>Регистрация</h1>
-    <form id="registerForm">
-        <input type="text" id="newUsername" placeholder="Имя пользователя">
-        <input type="password" id="newPassword" placeholder="Пароль">
-        <button type="submit">Зарегистрироваться</button>
-    </form>
-    <a href="../html/index.html">Уже есть аккаунт? Войти</a>
+    <div class="auth-wrapper">
+        <div class="auth-card">
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px;">
+                <div class="logo-icon">A</div>
+                <div>
+                    <div class="logo-title">Aura Notes</div>
+                    <div style="font-size: 12px; color: var(--text-muted);">Microservices SaaS Platform</div>
+                </div>
+            </div>
+
+            <h1>Створити акаунт</h1>
+            <p class="subtitle">Отримайте безкоштовний доступ до хмарного блокнота.</p>
+
+            <div id="alertBox" style="display: none;" class="alert"></div>
+
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="username">Ім'я користувача</label>
+                    <input type="text" id="username" placeholder="alex_dev" required autofocus>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Пароль</label>
+                    <input type="password" id="password" placeholder="Введіть надійний пароль" required minlength="4">
+                </div>
+
+                <button type="submit" id="submitBtn" class="btn btn-primary" style="margin-top: 10px;">
+                    Зареєструватися →
+                </button>
+            </form>
+
+            <div style="margin-top: 24px; text-align: center; font-size: 14px; color: var(--text-secondary);">
+                Вже є акаунт? <a href="index.html" style="color: var(--primary); font-weight: 600; text-decoration: none;">Увійти</a>
+            </div>
+        </div>
+    </div>
+
     <script src="../js/register.js"></script>
 </body>
 </html>

@@ -2,41 +2,84 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const sqlite3 = require('sqlite3').verbose();
+const path = require('path');
 
 const app = express();
+const PORT = 3002;
 
 app.use(bodyParser.json());
 app.use(cors());
 
-let db = new sqlite3.Database('users.db', (err) => {
+// Підключення до бази даних
+const dbPath = path.resolve(__dirname, 'users.db');
+const db = new sqlite3.Database(dbPath, (err) => {
     if (err) {
-        console.error(err.message);
+        console.error('Error connecting to DB:', err.message);
+    } else {
+        console.log('Auth Service connected to SQLite DB.');
     }
-    console.log('Connected to the users database.');
 });
 
+// Створення таблиці користувачів, якщо не існує
+db.run(`CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT UNIQUE NOT NULL,
+    password TEXT NOT NULL,
+    plan TEXT DEFAULT 'Free',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+)`);
+
+// Health Check
+app.get('/health', (req, res) => {
+    res.json({ service: 'Auth Service', status: 'healthy', port: PORT });
+});
+
+// Реєстрація
 app.post('/register', (req, res) => {
     const { username, password } = req.body;
-    const sql = `INSERT INTO users (username, password) VALUES (?, ?)`;
-    db.run(sql, [username, password], function(err) {
+    if (!username || !password) {
+        return res.status(400).json({ error: "Поля 'username' та 'password' обов'язкові" });
+    }
+
+    const sql = `INSERT INTO users (username, password, plan) VALUES (?, ?, 'Free')`;
+    db.run(sql, [username.trim(), password], function(err) {
         if (err) {
-            return res.status(400).json({ message: 'Registration failed' });
+            if (err.message.includes('UNIQUE constraint failed')) {
+                return res.status(400).json({ error: `Користувач '${username}' вже існує.` });
+            }
+            return res.status(500).json({ error: 'Помилка реєстрації: ' + err.message });
         }
-        res.status(201).json({ message: 'Registration successful' });
+        res.status(201).json({
+            message: 'Реєстрація успішна!',
+            userId: this.lastID,
+            username: username.trim()
+        });
     });
 });
 
+// Логін
 app.post('/login', (req, res) => {
     const { username, password } = req.body;
-    const sql = `SELECT * FROM users WHERE username = ? AND password = ?`;
-    db.get(sql, [username, password], (err, row) => {
-        if (err || !row) {
-            return res.status(401).json({ message: 'Invalid credentials' });
+    if (!username || !password) {
+        return res.status(400).json({ error: "Поля 'username' та 'password' обов'язкові" });
+    }
+
+    const sql = `SELECT id, username, plan, created_at FROM users WHERE username = ? AND password = ?`;
+    db.get(sql, [username.trim(), password], (err, row) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
         }
-        res.json({ message: 'Login successful' });
+        if (!row) {
+            return res.status(401).json({ error: 'Невірний логін або пароль' });
+        }
+        res.json({
+            message: 'Вхід успішний!',
+            user: row,
+            token: `token_${Buffer.from(username).toString('base64')}`
+        });
     });
 });
 
-app.listen(3002, () => {
-    console.log('Auth Service running on port 3002');
+app.listen(PORT, () => {
+    console.log(`🔐 Auth Service running on http://localhost:${PORT}`);
 });

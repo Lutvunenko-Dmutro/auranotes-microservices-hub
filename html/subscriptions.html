@@ -1,21 +1,112 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uk">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Подписки</title>
+    <title>Тарифи та Підписки — Aura Notes</title>
     <link rel="stylesheet" href="../css/Styles.css">
 </head>
 <body>
-    <form id="subscriptionForm">
-        <h1>Подписки</h1>
-        <label for="targetUsername">Имя пользователя для подписки:</label>
-        <input type="text" id="targetUsername" placeholder="Введите имя пользователя">
-        <button id="subscribeBtn" type="submit">Подписаться</button>
-    </form>
-    <h2>Ваши подписки</h2>
-    <ul id="subscriptionsList"></ul>
-    <a href="../html/notes.html">Вернуться к блокноту</a>
+
+    <div class="app-container">
+        <!-- Navigation Bar -->
+        <nav class="navbar">
+            <a href="notes.html" class="logo-group">
+                <div class="logo-icon">A</div>
+                <div class="logo-title">Aura Notes</div>
+            </a>
+
+            <div class="user-nav">
+                <div class="user-badge">
+                    <span>👤 <span id="currentUser">Користувач</span></span>
+                    <span id="userPlanBadge" class="plan-pill">FREE</span>
+                </div>
+
+                <a href="notes.html" class="btn btn-secondary" style="font-size: 13px; padding: 8px 14px;">
+                    📝 До нотаток
+                </a>
+
+                <a href="../Microservices Example/microservices.html" target="_blank" class="btn btn-secondary" style="font-size: 13px; padding: 8px 14px;">
+                    ⚙️ Hub ↗
+                </a>
+            </div>
+        </nav>
+
+        <div style="text-align: center; max-width: 600px; margin: 0 auto 16px;">
+            <h1>Оберіть ідеальний тариф</h1>
+            <p class="subtitle">Розширте ліміти та отримайте доступ до преміальних можливостей мікросервісу.</p>
+        </div>
+
+        <div id="alertBox" style="display: none; max-width: 600px; margin: 0 auto 24px;" class="alert alert-success"></div>
+
+        <!-- Pricing Grid -->
+        <div class="pricing-grid">
+            
+            <!-- Free Card -->
+            <div class="pricing-card">
+                <div>
+                    <h2>Starter</h2>
+                    <p style="color: var(--text-secondary); font-size: 13px;">Базовий рівень для знайомства з платформою.</p>
+                    <div class="price">$0 <span>/ місяць</span></div>
+
+                    <ul class="features-list">
+                        <li>До 5 нотаток</li>
+                        <li>Локальна синхронізація</li>
+                        <li>Базові категорії</li>
+                        <li>Доступ до Web UI</li>
+                    </ul>
+                </div>
+
+                <button class="btn btn-secondary" id="btnPlanFree" onclick="selectPlan('Free')" style="width: 100%;">
+                    Поточний тариф
+                </button>
+            </div>
+
+            <!-- Pro Card (Featured) -->
+            <div class="pricing-card featured">
+                <div class="plan-badge">Найпопулярніший</div>
+                <div>
+                    <h2>Pro Creator</h2>
+                    <p style="color: var(--text-secondary); font-size: 13px;">Для активної роботи, навчання та проєктів.</p>
+                    <div class="price">$9 <span>/ місяць</span></div>
+
+                    <ul class="features-list">
+                        <li><strong>До 50 нотаток</strong></li>
+                        <li><strong>Синхронізація з Subscriptions Service (:3001)</strong></li>
+                        <li>Пріоритетна підтримка</li>
+                        <li>Всі преміум категорії</li>
+                        <li>Експорт у форматі Markdown</li>
+                    </ul>
+                </div>
+
+                <button class="btn btn-primary" id="btnPlanPro" onclick="selectPlan('Pro Plan')">
+                    ⚡ Перейти на Pro
+                </button>
+            </div>
+
+            <!-- Enterprise Card -->
+            <div class="pricing-card">
+                <div>
+                    <h2>Enterprise VIP</h2>
+                    <p style="color: var(--text-secondary); font-size: 13px;">Максимальна продуктивність без жодних обмежень.</p>
+                    <div class="price">$29 <span>/ місяць</span></div>
+
+                    <ul class="features-list">
+                        <li><strong>Необмежена кількість нотаток (∞)</strong></li>
+                        <li>Повний доступ до REST API мікросервісів</li>
+                        <li>Виділена база даних SQLite</li>
+                        <li>24/7 підтримка інженерів</li>
+                    </ul>
+                </div>
+
+                <button class="btn btn-secondary" id="btnPlanEnterprise" onclick="selectPlan('Enterprise VIP')" style="width: 100%;">
+                    Оформити VIP
+                </button>
+            </div>
+
+        </div>
+    </div>
+
     <script src="../js/subscriptions.js"></script>
 </body>
 </html>

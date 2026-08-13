@@ -1,97 +1,640 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>Microservices Example</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AURA Microservices Control Hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #090d16;
+            --panel: rgba(20, 28, 48, 0.7);
+            --panel-border: rgba(255, 255, 255, 0.08);
+            --panel-hover: rgba(26, 36, 62, 0.85);
+            --accent: #6366f1;
+            --accent-glow: rgba(99, 102, 241, 0.35);
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --code-bg: #030712;
+            --radius: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 32px 20px;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.12) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(16, 185, 129, 0.08) 0%, transparent 40%);
+            background-attachment: fixed;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+            gap: 16px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--panel-border);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-logo {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--accent), #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 20px;
+            color: #fff;
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        .brand-title h1 {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-title p {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-link {
+            padding: 10px 18px;
+            background: var(--panel);
+            border: 1px solid var(--panel-border);
+            color: var(--text-main);
+            text-decoration: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-link:hover {
+            background: var(--panel-hover);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        /* Status Grid */
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .status-card {
+            background: var(--panel);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--panel-border);
+            border-radius: var(--radius);
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.2s;
+        }
+
+        .status-card:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+            background: var(--panel-hover);
+        }
+
+        .service-info h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .service-info span {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .badge.online {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .badge.offline {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: currentColor;
+            box-shadow: 0 0 8px currentColor;
+        }
+
+        /* Main Workspace Grid */
+        .workspace-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 960px) {
+            .workspace-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .section-card {
+            background: var(--panel);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--panel-border);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .section-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            background: rgba(99, 102, 241, 0.15);
+            color: var(--accent);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+        }
+
+        .section-header h2 {
+            font-size: 17px;
+            font-weight: 700;
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 11px 14px;
+            background: var(--code-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 10px;
+            color: var(--text-main);
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), #4f46e5);
+            color: white;
+            box-shadow: 0 2px 10px var(--accent-glow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px var(--accent-glow);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text-main);
+            border: 1px solid var(--panel-border);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        /* Console Output */
+        .console-container {
+            position: sticky;
+            top: 24px;
+        }
+
+        .console-card {
+            background: var(--code-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .console-topbar {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 14px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--panel-border);
+        }
+
+        .console-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        .traffic-lights {
+            display: flex;
+            gap: 6px;
+        }
+
+        .light {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .light.red { background: #ef4444; }
+        .light.yellow { background: #f59e0b; }
+        .light.green { background: #10b981; }
+
+        .meta-tags {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .meta-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text-muted);
+        }
+
+        .meta-tag.status-200, .meta-tag.status-201 {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .meta-tag.status-400, .meta-tag.status-401, .meta-tag.status-404 {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        pre {
+            padding: 18px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #38bdf8;
+            max-height: 520px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .empty-placeholder {
+            color: #64748b;
+            font-style: italic;
+        }
+    </style>
 </head>
 <body>
 
-    <!-- Users Service -->
-    <h2>Users Service</h2>
-    <button onclick="registerUser()">Register User</button>
-    <button onclick="getUser()">Get User</button>
-    <div id="usersOutput"></div>
+    <div class="container">
+        <header>
+            <div class="brand">
+                <div class="brand-logo">A</div>
+                <div class="brand-title">
+                    <h1>Aura Microservices Hub</h1>
+                    <p>Live Distributed Services Controller & API Explorer</p>
+                </div>
+            </div>
+            <div class="nav-actions">
+                <button class="btn-link" onclick="pingAllServices()">🔄 Оновити статус</button>
+                <a href="../html/index.html" class="btn-link" target="_blank">📱 Відкрити Веб-додаток ↗</a>
+            </div>
+        </header>
 
-    <!-- Subscriptions Service -->
-    <h2>Subscriptions Service</h2>
-    <button onclick="createSubscription()">Create Subscription</button>
-    <button onclick="getUserSubscriptions()">Get User Subscriptions</button>
-    <div id="subscriptionsOutput"></div>
+        <!-- Status Cards -->
+        <div class="status-grid">
+            <div class="status-card">
+                <div class="service-info">
+                    <h3>🔐 Auth Service</h3>
+                    <span>http://localhost:3002</span>
+                </div>
+                <div id="badge-auth" class="badge offline"><span class="dot"></span> <span>Перевірка...</span></div>
+            </div>
 
-    <!-- Auth Service -->
-    <h2>Auth Service</h2>
-    <button onclick="loginUser()">Login</button>
-    <div id="authOutput"></div>
+            <div class="status-card">
+                <div class="service-info">
+                    <h3>👤 Users Service</h3>
+                    <span>http://localhost:3000</span>
+                </div>
+                <div id="badge-users" class="badge offline"><span class="dot"></span> <span>Перевірка...</span></div>
+            </div>
+
+            <div class="status-card">
+                <div class="service-info">
+                    <h3>💳 Subscriptions Service</h3>
+                    <span>http://localhost:3001</span>
+                </div>
+                <div id="badge-subs" class="badge offline"><span class="dot"></span> <span>Перевірка...</span></div>
+            </div>
+        </div>
+
+        <!-- Main Workspace -->
+        <div class="workspace-grid">
+            
+            <!-- Forms Column -->
+            <div class="forms-column">
+                
+                <!-- Auth Service Card -->
+                <div class="section-card">
+                    <div class="section-header">
+                        <div class="section-icon">🔐</div>
+                        <h2>Auth Service (:3002)</h2>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Ім'я користувача (Username)</label>
+                        <input type="text" id="auth-username" value="alex_dev" placeholder="Введіть логін">
+                    </div>
+                    <div class="form-group">
+                        <label>Пароль (Password)</label>
+                        <input type="password" id="auth-password" value="Secret123!" placeholder="Введіть пароль">
+                    </div>
+
+                    <div class="btn-group">
+                        <button class="btn-primary" onclick="testRegister()">✨ Register User</button>
+                        <button class="btn-secondary" onclick="testLogin()">🔑 Login</button>
+                    </div>
+                </div>
+
+                <!-- Users Service Card -->
+                <div class="section-card">
+                    <div class="section-header">
+                        <div class="section-icon">👤</div>
+                        <h2>Users Service (:3000)</h2>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Пошук користувача за логіном</label>
+                        <input type="text" id="get-username" value="alex_dev" placeholder="Логін для пошуку">
+                    </div>
+
+                    <div class="btn-group">
+                        <button class="btn-primary" onclick="testGetUser()">🔍 Get User Details</button>
+                    </div>
+                </div>
+
+                <!-- Subscriptions Service Card -->
+                <div class="section-card">
+                    <div class="section-header">
+                        <div class="section-icon">💳</div>
+                        <h2>Subscriptions Service (:3001)</h2>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Користувач (Subscriber)</label>
+                        <input type="text" id="sub-user" value="alex_dev" placeholder="Ім'я користувача">
+                    </div>
+                    <div class="form-group">
+                        <label>Тарифний план або підписка на автора</label>
+                        <input type="text" id="sub-target" value="Pro Plan / Creator VIP" placeholder="Тариф або цільовий користувач">
+                    </div>
+
+                    <div class="btn-group">
+                        <button class="btn-primary" onclick="testCreateSubscription()">⚡ Create Subscription</button>
+                        <button class="btn-secondary" onclick="testGetSubscriptions()">📋 Get Subscriptions</button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Live Response Console Column -->
+            <div class="console-container">
+                <div class="console-card">
+                    <div class="console-topbar">
+                        <div class="console-title">
+                            <div class="traffic-lights">
+                                <span class="light red"></span>
+                                <span class="light yellow"></span>
+                                <span class="light green"></span>
+                            </div>
+                            <span>LIVE API RESPONSE</span>
+                        </div>
+                        <div class="meta-tags">
+                            <span id="response-status" class="meta-tag">STATUS: IDLE</span>
+                            <span id="response-time" class="meta-tag">0 ms</span>
+                        </div>
+                    </div>
+                    <pre id="console-output"><span class="empty-placeholder">// Виберіть дію або натисніть кнопку для тестування мікросервісів...</span></pre>
+                </div>
+            </div>
+
+        </div>
+    </div>
 
     <script>
-        async function registerUser() {
-            const newUser = {
-                username: 'testUser',
-                password: 'testPassword'
-            };
+        const AUTH_URL = 'http://localhost:3002';
+        const USERS_URL = 'http://localhost:3000';
+        const SUBS_URL = 'http://localhost:3001';
 
-            const response = await fetch('http://localhost:3002/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(newUser)
-            });
-
-            const data = await response.json();
-            document.getElementById('authOutput').innerText = JSON.stringify(data);
+        async function updateBadge(id, isOnline) {
+            const badge = document.getElementById(id);
+            if (isOnline) {
+                badge.className = 'badge online';
+                badge.innerHTML = '<span class="dot"></span> <span>Online</span>';
+            } else {
+                badge.className = 'badge offline';
+                badge.innerHTML = '<span class="dot"></span> <span>Offline</span>';
+            }
         }
 
-        async function getUser() {
-            const username = 'testUser'; // replace with actual username
-            const response = await fetch(`http://localhost:3000/users/${username}`);
-            const data = await response.json();
-            document.getElementById('usersOutput').innerText = JSON.stringify(data);
+        async function pingAllServices() {
+            // Auth
+            try {
+                const res = await fetch(`${AUTH_URL}/health`, { method: 'GET' }).catch(() => null);
+                updateBadge('badge-auth', !!res && (res.status === 200 || res.status === 404));
+            } catch (e) {
+                updateBadge('badge-auth', false);
+            }
+
+            // Users
+            try {
+                const res = await fetch(`${USERS_URL}/health`, { method: 'GET' }).catch(() => null);
+                updateBadge('badge-users', !!res && (res.status === 200 || res.status === 404));
+            } catch (e) {
+                updateBadge('badge-users', false);
+            }
+
+            // Subscriptions
+            try {
+                const res = await fetch(`${SUBS_URL}/health`, { method: 'GET' }).catch(() => null);
+                updateBadge('badge-subs', !!res && (res.status === 200 || res.status === 404));
+            } catch (e) {
+                updateBadge('badge-subs', false);
+            }
         }
 
-        async function createSubscription() {
-            const newSubscription = {
-                user: 'testUser',
-                targetUser: 'anotherUser'
-            };
+        function displayResponse(status, time, data) {
+            const statusEl = document.getElementById('response-status');
+            const timeEl = document.getElementById('response-time');
+            const outputEl = document.getElementById('console-output');
 
-            const response = await fetch('http://localhost:3001/subscriptions', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(newSubscription)
-            });
+            statusEl.textContent = `HTTP ${status}`;
+            statusEl.className = `meta-tag status-${status}`;
+            timeEl.textContent = `${time} ms`;
 
-            const data = await response.json();
-            document.getElementById('subscriptionsOutput').innerText = JSON.stringify(data);
+            outputEl.textContent = JSON.stringify(data, null, 2);
         }
 
-        async function getUserSubscriptions() {
-            const username = 'testUser'; // replace with actual username
-            const response = await fetch(`http://localhost:3001/subscriptions/${username}`);
-            const data = await response.json();
-            document.getElementById('subscriptionsOutput').innerText = JSON.stringify(data);
+        async function executeRequest(url, method, body = null) {
+            const start = performance.now();
+            try {
+                const options = {
+                    method,
+                    headers: { 'Content-Type': 'application/json' }
+                };
+                if (body) options.body = JSON.stringify(body);
+
+                const response = await fetch(url, options);
+                const duration = Math.round(performance.now() - start);
+                const json = await response.json().catch(() => ({ message: response.statusText }));
+                displayResponse(response.status, duration, json);
+                pingAllServices();
+            } catch (err) {
+                const duration = Math.round(performance.now() - start);
+                displayResponse(500, duration, { error: "Network / Connection Error", details: err.message, note: "Перевірте чи запущено Node.js мікросервіс" });
+                pingAllServices();
+            }
         }
 
-        async function loginUser() {
-            const credentials = {
-                username: 'testUser',
-                password: 'testPassword'
-            };
-
-            const response = await fetch('http://localhost:3002/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(credentials)
-            });
-
-            const data = await response.json();
-            document.getElementById('authOutput').innerText = JSON.stringify(data);
+        function testRegister() {
+            const username = document.getElementById('auth-username').value;
+            const password = document.getElementById('auth-password').value;
+            executeRequest(`${AUTH_URL}/register`, 'POST', { username, password });
         }
+
+        function testLogin() {
+            const username = document.getElementById('auth-username').value;
+            const password = document.getElementById('auth-password').value;
+            executeRequest(`${AUTH_URL}/login`, 'POST', { username, password });
+        }
+
+        function testGetUser() {
+            const username = document.getElementById('get-username').value;
+            executeRequest(`${USERS_URL}/users/${encodeURIComponent(username)}`, 'GET');
+        }
+
+        function testCreateSubscription() {
+            const user = document.getElementById('sub-user').value;
+            const targetUser = document.getElementById('sub-target').value;
+            executeRequest(`${SUBS_URL}/subscriptions`, 'POST', { user, targetUser });
+        }
+
+        function testGetSubscriptions() {
+            const user = document.getElementById('sub-user').value;
+            executeRequest(`${SUBS_URL}/subscriptions/${encodeURIComponent(user)}`, 'GET');
+        }
+
+        // Auto ping on load
+        window.addEventListener('DOMContentLoaded', () => {
+            pingAllServices();
+            setInterval(pingAllServices, 10000);
+        });
     </script>
-
 </body>
 </html>

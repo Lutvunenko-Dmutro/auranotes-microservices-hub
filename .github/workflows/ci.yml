@@ -1,0 +1,32 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install dependencies
+      working-directory: './Microservices Example'
+      run: npm install
+
+    - name: Syntax and lint check
+      working-directory: './Microservices Example'
+      run: |
+        node -c auth-service.js
+        node -c users-service.js
+        node -c subscriptions-service.js
+        node -c start-all.js
