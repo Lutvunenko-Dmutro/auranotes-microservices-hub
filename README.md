@@ -20,29 +20,30 @@
 
 Платформа розділена на незалежні мікросервіси, кожен з яких відповідає за свою бізнес-логіку:
 
-```
-                  ┌─────────────────────────────────────┐
-                  │   📱 Modern Web UI (Glassmorphism)  │
-                  │   (Login / Register / Notes / Subs) │
-                  └──────────────────┬──────────────────┘
-                                     │
-           ┌─────────────────────────┼─────────────────────────┐
-           ▼                         ▼                         ▼
-┌─────────────────────┐   ┌─────────────────────┐   ┌─────────────────────┐
-│  🔐 Auth Service    │   │  👤 Users Service   │   │  💳 Subscriptions   │
-│     (Port 3002)     │   │     (Port 3000)     │   │     (Port 3001)     │
-│                     │   │                     │   │                     │
-│  - /register        │   │  - /users           │   │  - /subscriptions   │
-│  - /login           │   │  - /users/:username │   │  - /subscriptions/:u│
-│  - /health          │   │  - /health          │   │  - /health          │
-└──────────┬──────────┘   └──────────┬──────────┘   └──────────┬──────────┘
-           │                         │                         │
-           └─────────────────────────┼─────────────────────────┘
-                                     ▼
-                        ┌────────────────────────┐
-                        │   🗄️ SQLite Database   │
-                        │      (users.db)        │
-                        └────────────────────────┘
+```mermaid
+graph TD
+    Client["📱 Modern Web UI (Glassmorphism)<br/><i>Login • Register • Notes • Subscriptions</i>"]
+    Hub["🎛️ Microservices Control Hub<br/><i>API Explorer • Live Health • Latency Monitor</i>"]
+
+    subgraph Cluster["🚀 Aura Microservices Cluster (Node.js & Express)"]
+        Auth["🔐 Auth Service<br/><code>Port 3002</code><br/>/register • /login • /health"]
+        Users["👤 Users Service<br/><code>Port 3000</code><br/>/users • /users/:username"]
+        Subs["💳 Subscriptions Service<br/><code>Port 3001</code><br/>/subscriptions • /health"]
+    end
+
+    DB[("🗄️ SQLite Database<br/><code>users.db</code>")]
+
+    Client -->|Auth & JWT| Auth
+    Client -->|User Profiles| Users
+    Client -->|Plan Upgrades| Subs
+
+    Hub -.->|Ping & Tests| Auth
+    Hub -.->|Ping & Tests| Users
+    Hub -.->|Ping & Tests| Subs
+
+    Auth -->|Auth Queries| DB
+    Users -->|User CRUD| DB
+    Subs -->|Subscriptions| DB
 ```
 
 ---
